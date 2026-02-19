@@ -6,6 +6,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+// Customize invalid model state responses so we log validation problems and return details
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning("Invalid model state: {ModelState}", context.ModelState);
+
+        var problem = new Microsoft.AspNetCore.Mvc.ValidationProblemDetails(context.ModelState)
+        {
+            Title = "Model validation error",
+            Status = StatusCodes.Status400BadRequest
+        };
+        return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(problem);
+    };
+});
 builder.Services.AddOpenApi();
 
 // Add DbContext with SQL Server connection
@@ -43,6 +59,9 @@ catch (Exception ex)
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Show developer exception page to surface errors during development
+    app.UseDeveloperExceptionPage();
+
     app.MapOpenApi();
 
     // Exposes Swagger UI: /swagger
@@ -54,11 +73,29 @@ if (app.Environment.IsDevelopment())
 
 }
 
+// Global exception logging middleware to capture unhandled errors and return JSON
+app.Use(async (context, next) =>
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Unhandled exception processing request {Method} {Path}", context.Request.Method, context.Request.Path);
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+        var result = new { error = "An unexpected error occurred" };
+        await context.Response.WriteAsJsonAsync(result);
+    }
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapOpenApi();
+// MapOpenApi already called in development environment above. Avoid mapping twice.
 
 app.Run();

@@ -26,8 +26,9 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GameResponseDTO>>> GetGames(int tournamentId)
+    public async Task<ActionResult<IEnumerable<GameResponseDTO>>> GetGames([FromRoute] int tournamentId)
     {
+        _logger.LogInformation("GetGames called for tournamentId={TournamentId}", tournamentId);
         // Verify tournament exists
         var tournament = await _tournamentService.GetByIdAsync(tournamentId);
         if (tournament == null)
@@ -40,8 +41,9 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<GameResponseDTO>> GetGame(int tournamentId, int id)
+    public async Task<ActionResult<GameResponseDTO>> GetGame([FromRoute] int tournamentId, int id)
     {
+        _logger.LogInformation("GetGame called for tournamentId={TournamentId} id={Id}", tournamentId, id);
         // Verify tournament exists
         var tournament = await _tournamentService.GetByIdAsync(tournamentId);
         if (tournament == null)
@@ -57,11 +59,27 @@ public class GamesController : ControllerBase
         return Ok(game);
     }
 
+    /// <summary>
+    /// Create a new game for the specified tournament.
+    /// </summary>
+    /// <remarks>
+    /// The `tournamentId` is provided in the route. Do not include `tournamentId` in the request body.
+    /// Example:
+    /// {
+    ///   "title": "Qualifying Match 1",
+    ///   "time": "2026-03-02T13:00:00Z"
+    /// }
+    /// </remarks>
     [HttpPost]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(GameResponseDTO), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GameResponseDTO>> CreateGame(
-        int tournamentId,
+        [FromRoute] int tournamentId,
         [FromBody] GameCreateDTO createDTO)
     {
+        _logger.LogInformation("CreateGame called for tournamentId={TournamentId} with title={Title}", tournamentId, createDTO?.Title);
         // Check rate limit
         var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         if (!_rateLimitingService.IsRequestAllowed(clientIp))
@@ -76,11 +94,7 @@ public class GamesController : ControllerBase
             return NotFound(new { error = "Tournament not found" });
         }
 
-        // Validate that TournamentId matches the route parameter
-        if (createDTO.TournamentId != tournamentId)
-        {
-            return BadRequest(new { error = "Tournament ID in body does not match route parameter" });
-        }
+        // TournamentId is taken from the route; no need to provide it in the body
 
         if (!ModelState.IsValid)
         {
@@ -89,7 +103,7 @@ public class GamesController : ControllerBase
 
         try
         {
-            var game = await _gameService.CreateAsync(createDTO);
+            var game = await _gameService.CreateAsync(tournamentId, createDTO);
             return CreatedAtAction(nameof(GetGame), new { tournamentId = tournamentId, id = game.Id }, game);
         }
         catch (KeyNotFoundException ex)
@@ -102,12 +116,20 @@ public class GamesController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Update an existing game. The `tournamentId` in the route identifies the parent tournament.
+    /// </summary>
     [HttpPut("{id}")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(GameResponseDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GameResponseDTO>> UpdateGame(
-        int tournamentId,
+        [FromRoute] int tournamentId,
         int id,
         [FromBody] GameUpdateDTO updateDTO)
     {
+        _logger.LogInformation("UpdateGame called for tournamentId={TournamentId} id={Id}", tournamentId, id);
         // Verify tournament exists
         var tournament = await _tournamentService.GetByIdAsync(tournamentId);
         if (tournament == null)
@@ -143,8 +165,9 @@ public class GamesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteGame(int tournamentId, int id)
+    public async Task<ActionResult> DeleteGame([FromRoute] int tournamentId, int id)
     {
+        _logger.LogInformation("DeleteGame called for tournamentId={TournamentId} id={Id}", tournamentId, id);
         // Verify tournament exists
         var tournament = await _tournamentService.GetByIdAsync(tournamentId);
         if (tournament == null)

@@ -9,7 +9,7 @@ public interface IGameService
 {
     Task<IEnumerable<GameResponseDTO>> GetAllAsync(int tournamentId);
     Task<GameResponseDTO?> GetByIdAsync(int id);
-    Task<GameResponseDTO> CreateAsync(GameCreateDTO dto);
+    Task<GameResponseDTO> CreateAsync(int tournamentId, GameCreateDTO dto);
     Task<GameResponseDTO> UpdateAsync(int id, GameUpdateDTO dto);
     Task<bool> DeleteAsync(int id);
 }
@@ -38,20 +38,20 @@ public class GameService : IGameService
         return game != null ? MapToResponseDTO(game) : null;
     }
 
-    public async Task<GameResponseDTO> CreateAsync(GameCreateDTO dto)
+    public async Task<GameResponseDTO> CreateAsync(int tournamentId, GameCreateDTO dto)
     {
-        // Verify tournament exists
-        var tournament = await _context.Tournaments.FirstOrDefaultAsync(t => t.Id == dto.TournamentId);
+        // Verify tournament exists (tournamentId comes from route)
+        var tournament = await _context.Tournaments.FirstOrDefaultAsync(t => t.Id == tournamentId);
         if (tournament == null)
         {
-            throw new KeyNotFoundException($"Tournament with id {dto.TournamentId} not found");
+            throw new KeyNotFoundException($"Tournament with id {tournamentId} not found");
         }
 
         var game = new Game
         {
             Title = dto.Title,
             Time = dto.Time,
-            TournamentId = dto.TournamentId,
+            TournamentId = tournamentId,
             Tournament = tournament
         };
 

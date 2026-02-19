@@ -12,8 +12,7 @@ public class GameCreateDTO
     [CustomValidation(typeof(GameCreateDTO), nameof(ValidateTime))]
     public DateTime Time { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "TournamentId must be valid")]
-    public int TournamentId { get; set; }
+    // TournamentId is provided via route — removed from body to avoid duplication
 
     public static ValidationResult? ValidateTime(object? value, ValidationContext context)
     {

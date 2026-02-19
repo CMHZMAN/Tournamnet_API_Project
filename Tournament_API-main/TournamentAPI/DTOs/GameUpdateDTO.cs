@@ -12,9 +12,28 @@ public class GameUpdateDTO
     [CustomValidation(typeof(GameUpdateDTO), nameof(ValidateTime))]
     public DateTime Time { get; set; }
 
-    public static ValidationResult? ValidateTime(DateTime time, ValidationContext context)
+    public static ValidationResult? ValidateTime(object? value, ValidationContext context)
     {
-        if (time <= DateTime.Now)
+        if (value == null)
+        {
+            return new ValidationResult("Time is required");
+        }
+
+        DateTime time;
+        if (value is DateTime dt)
+        {
+            time = dt;
+        }
+        else if (value is DateTimeOffset dto)
+        {
+            time = dto.UtcDateTime;
+        }
+        else if (!DateTime.TryParse(value.ToString(), out time))
+        {
+            return new ValidationResult("Invalid time format");
+        }
+
+        if (time.ToUniversalTime() <= DateTime.UtcNow)
         {
             return new ValidationResult("Time cannot be in the past");
         }
