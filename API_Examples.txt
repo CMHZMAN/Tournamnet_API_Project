@@ -1,0 +1,35 @@
+Request: POST http://localhost:5000/api/tournaments
+Request bodies:
+
+Tournaments:
+1: { "title": "Spring Championship Rumble", "description": "Open tournament", "maxPlayers": 16, "date": "2026-03-02T12:00:00Z" }
+2: { "title": "Summer Tournament", "description": "Private tournament", "maxPlayers": 10, "date": "2026-06-15T18:00:00Z" }
+3: { "title": "Autumn Rumble", "description": "Open tournament", "maxPlayers": 32, "date": "2026-08-20T12:00:00Z" }
+
+
+
+Request: POST http://localhost:5000/api/tournaments/{id}/games
+
+Games:
+{ "title": "Qualifying Match 1", "time": "2026-03-02T13:00:00Z", "tournamentId": 1 }
+{ "title": "Qualifying Match 2", "time": "2026-03-02T14:00:00Z", "tournamentId": 1 }
+{ "title": "Qualifying Match 3", "time": "2026-03-02T15:00:00Z", "tournamentId": 1 }
+{ "title": "Finals", "time": "2026-03-02T18:00:00Z", "tournamentId": 1 }
+
+{ "title": "Qualifying Match 1", "time": "2026-06-15T13:00:00Z", "tournamentId": 2 }
+{ "title": "Qualifying Match 2", "time": "2026-06-15T14:00:00Z", "tournamentId": 2 }
+{ "title": "Qualifying Match 3", "time": "2026-06-15T15:00:00Z", "tournamentId": 2 }
+{ "title": "Finals", "time": "2026-03-02T18:00:00Z", "tournamentId": 2 }
+
+{ "title": "Qualifying Match 1", "time": "2026-08-20T13:00:00Z", "tournamentId": 3 }
+{ "title": "Qualifying Match 2", "time": "2026-08-20T14:00:00Z", "tournamentId": 3 }
+{ "title": "Qualifying Match 3", "time": "2026-08-20T15:00:00Z", "tournamentId": 3 }
+{ "title": "Finals", "time": "2026-03-02T18:00:00Z", "tournamentId": 3 }
+
+
+Update:
+PUT http://localhost:5000/api/tournaments/1
+{ "title": "Spring Championship", "description": "Open tournament", "maxPlayers": 16, "date": "2026-03-02T12:00:00Z" }
+
+Delete:
+DELETE http://localhost:5000/api/tournaments/{id}/games({id}
