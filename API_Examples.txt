@@ -11,20 +11,20 @@ Tournaments:
 Request: POST http://localhost:5000/api/tournaments/{id}/games
 
 Games:
-{ "title": "Qualifying Match 1", "time": "2026-03-02T13:00:00Z", "tournamentId": 1 }
-{ "title": "Qualifying Match 2", "time": "2026-03-02T14:00:00Z", "tournamentId": 1 }
-{ "title": "Qualifying Match 3", "time": "2026-03-02T15:00:00Z", "tournamentId": 1 }
-{ "title": "Finals", "time": "2026-03-02T18:00:00Z", "tournamentId": 1 }
+{ "title": "Qualifying Match 1", "time": "2026-03-02T13:00:00Z" }
+{ "title": "Qualifying Match 2", "time": "2026-03-02T14:00:00Z" }
+{ "title": "Qualifying Match 3", "time": "2026-03-02T15:00:00Z" }
+{ "title": "Finals", "time": "2026-03-02T18:00:00Z" }
 
-{ "title": "Qualifying Match 1", "time": "2026-06-15T13:00:00Z", "tournamentId": 2 }
-{ "title": "Qualifying Match 2", "time": "2026-06-15T14:00:00Z", "tournamentId": 2 }
-{ "title": "Qualifying Match 3", "time": "2026-06-15T15:00:00Z", "tournamentId": 2 }
-{ "title": "Finals", "time": "2026-03-02T18:00:00Z", "tournamentId": 2 }
+{ "title": "Qualifying Match 1", "time": "2026-06-15T13:00:00Z" }
+{ "title": "Qualifying Match 2", "time": "2026-06-15T14:00:00Z" }
+{ "title": "Qualifying Match 3", "time": "2026-06-15T15:00:00Z" }
+{ "title": "Finals", "time": "2026-03-02T18:00:00Z" }
 
-{ "title": "Qualifying Match 1", "time": "2026-08-20T13:00:00Z", "tournamentId": 3 }
-{ "title": "Qualifying Match 2", "time": "2026-08-20T14:00:00Z", "tournamentId": 3 }
-{ "title": "Qualifying Match 3", "time": "2026-08-20T15:00:00Z", "tournamentId": 3 }
-{ "title": "Finals", "time": "2026-03-02T18:00:00Z", "tournamentId": 3 }
+{ "title": "Qualifying Match 1", "time": "2026-08-20T13:00:00Z" }
+{ "title": "Qualifying Match 2", "time": "2026-08-20T14:00:00Z" }
+{ "title": "Qualifying Match 3", "time": "2026-08-20T15:00:00Z" }
+{ "title": "Finals", "time": "2026-03-02T18:00:00Z" }
 
 
 Update:
@@ -33,3 +33,4 @@ PUT http://localhost:5000/api/tournaments/1
 
 Delete:
 DELETE http://localhost:5000/api/tournaments/{id}/games({id}
+
